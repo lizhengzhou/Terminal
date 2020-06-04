@@ -137,6 +137,12 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);//退出H5界面
     }
 
+    @Override
+    protected void onResume() {
+        mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
+        super.onResume();
+    }
+
     //销毁Webview
     @Override
     protected void onDestroy() {
