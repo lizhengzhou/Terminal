@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     WebSettings mWebSettings;
-    String _curUrl = "http://lanhai.mes.mooho.com.cn/pda/";
+    String _curUrl = "http://spcs.mooho.com.cn/pda/";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -107,7 +107,9 @@ public class MainActivity extends AppCompatActivity {
         SoftKeyBoardListener.setListener(MainActivity.this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
             @Override
             public void keyBoardShow(int height) {
-
+                // Schedule a runnable to remove the status and navigation bar after a delay
+                mHideHandler.removeCallbacks(mHideRunnable);
+                mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
             }
 
             @Override
@@ -135,6 +137,11 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onKeyDown(keyCode, event);//退出H5界面
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
