@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
     WebSettings mWebSettings;
-    String _curUrl = "http://47.98.236.112:8001/pda/";
+    String _curUrl = "file:///android_asset/web/index.html";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override

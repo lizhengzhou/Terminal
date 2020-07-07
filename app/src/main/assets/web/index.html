@@ -1,0 +1,26 @@
+<html>
+<head>
+    <script src="js/jquery.min.js"></script>
+    <script src="js/vconsole.min.js"></script>
+    <script>
+        var vConsole = new VConsole();
+    </script>
+    <script>
+        document.onkeyup = function (event) {
+            console.log(event.keyCode)
+            $('#keyCode').text( $('#keyCode').text() +' '+ event.keyCode )
+            $('#key').text( $('#key').text() + event.key )
+            event.preventDefault();
+            window.event.returnValue = false;
+
+            return false;
+        }
+    </script>
+</head>
+<body>
+key:
+<p id="key"></p>
+keyCode:
+<p id="keyCode"></p>
+</body>
+</html>
