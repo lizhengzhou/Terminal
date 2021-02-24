@@ -1,45 +1,26 @@
 package com.lizz.terminal;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import androidx.appcompat.app.AppCompatActivity;
+import java.lang.reflect.InvocationTargetException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
-    private static final int UI_ANIMATION_DELAY = 300;
-    private final Handler mHideHandler = new Handler();
     WebView mWebview;
-    private final Runnable mHideRunnable = new Runnable() {
-        @SuppressLint("InlinedApi")
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-            mWebview.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
     WebSettings mWebSettings;
-    String _curUrl = "http://spcs.mooho.com.cn/pda/";
+
+    String _curUrl = "http://admin.sandenjjg.mooho.com.cn/pda";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -101,26 +82,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-
-        SoftKeyBoardListener.setListener(MainActivity.this, new SoftKeyBoardListener.OnSoftKeyBoardChangeListener() {
-            @Override
-            public void keyBoardShow(int height) {
-                // Schedule a runnable to remove the status and navigation bar after a delay
-                mHideHandler.removeCallbacks(mHideRunnable);
-                mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-            }
-
-            @Override
-            public void keyBoardHide(int height) {
-                // Schedule a runnable to remove the status and navigation bar after a delay
-                mHideHandler.removeCallbacks(mHideRunnable);
-                mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
-            }
-        });
-
-
     }
 
     //fix -> Binary XML file line #9: Error inflating class android.webkit.WebView
@@ -141,13 +102,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        mWebview.onPause();
         super.onPause();
     }
 
     @Override
     protected void onResume() {
-        mHideHandler.postDelayed(mHideRunnable, UI_ANIMATION_DELAY);
         super.onResume();
+        mWebview.onResume();
     }
 
     //销毁Webview
