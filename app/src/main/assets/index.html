@@ -40,6 +40,19 @@
         btPrinter.print(label);
       }
 
+      function btClose(){
+        if (!window.btPrinter) alert("蓝牙打印插件加载异常");
+        btPrinter.close();
+      }
+
+      function btStatus(){
+        if (!window.btPrinter) alert("蓝牙打印插件加载异常");
+        btPrinter.onStatus = function(msg){
+        log(msg);
+        return 'ok'
+        }
+      }
+
       function log(msg) {
         document.getElementById("msg").innerText += msg + "\r\n";
       }
@@ -54,6 +67,11 @@
     <input type="button" value="连接" id="bt_con" onclick="btOpen()" />
     <br />
     <input type="button" value="打印" id="bt_print" onclick="btPrint()" />
+    <br />
+    <input type="button" value="断开" id="bt_close" onclick="btClose()" />
+    <br />
+    <br />
+    <input type="button" value="状态" id="bt_status" onclick="btStatus()" />
     <br />
     <span id="msg"></span>
   </body>

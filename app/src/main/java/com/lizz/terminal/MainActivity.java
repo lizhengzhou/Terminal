@@ -3,18 +3,27 @@ package com.lizz.terminal;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
+import android.webkit.ConsoleMessage;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -22,11 +31,15 @@ import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
+    private static final String TAG = MainActivity.class.getSimpleName();
+
     WebView mWebview;
     WebSettings mWebSettings;
 
     String _curUrl = "file:///android_asset/index.html";
 
+    public static final int REQUEST_PERMISSION = 1;
+    public static final int REQUEST_ENABLE_BT = 2;
 
     BTPrinterInterface btPrinter;
 
@@ -37,6 +50,8 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
 
         checkPermission();
+
+        initBluetooth();
 
         mWebview = findViewById(R.id.webView);
 
@@ -50,7 +65,7 @@ public class MainActivity extends Activity {
         mWebSettings.setUseWideViewPort(true);
         mWebSettings.setLoadWithOverviewMode(true);
 
-        btPrinter = new BTPrinterInterface(this);
+        btPrinter = new BTPrinterInterface(this, mHandler);
 
         mWebview.addJavascriptInterface(btPrinter, "btPrinter");
 
@@ -75,6 +90,12 @@ public class MainActivity extends Activity {
             @Override
             public void onReceivedTitle(WebView view, String title) {
 
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                Log.i(TAG, consoleMessage.message());
+                return super.onConsoleMessage(consoleMessage);
             }
 
             //获取加载进度
@@ -122,7 +143,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (btPrinter != null) {
-            btPrinter.destroy();
+            btPrinter.close();
         }
 
         if (mWebview != null) {
@@ -155,9 +176,51 @@ public class MainActivity extends Activity {
 
         if (per.size() > 0) {
             String[] p = new String[per.size()];
-            ActivityCompat.requestPermissions(this, per.toArray(p), 0x004);
+            ActivityCompat.requestPermissions(this, per.toArray(p), REQUEST_PERMISSION);
         }
 
     }
+
+
+    private void initBluetooth() {
+        // Get the local Bluetooth adapter
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        // If the adapter is null, then Bluetooth is not supported
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not supported by the device", Toast.LENGTH_LONG);
+        } else {
+            // If BT is not on, request that it be enabled.
+            // setupChat() will then be called during onActivityResult
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+            }
+        }
+    }
+
+
+    Handler mHandler = new Handler() {
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            switch (msg.what) {
+
+                case 0x01:
+
+                    int status = msg.getData().getInt("STATUS");
+
+                    Log.i(TAG, "status:" + status);
+
+                    PrinterStatus currentStatus = PrinterStatus.getByCode(status);
+
+                    if (mWebview != null) {
+                        mWebview.evaluateJavascript(BTPrinterInterface.name + ".onStatus" + "('" + currentStatus.getName() + "')", null);
+                    }
+
+                    break;
+
+            }
+        }
+    };
 
 }
