@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
     WebView mWebview;
     WebSettings mWebSettings;
 
-    String _curUrl = "http://admin.sandenjjg.mooho.com.cn/pda";
+    String _curUrl = "http://lwmesdev.cnhtcerp.com:50000/apis/pda";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -36,6 +36,14 @@ public class MainActivity extends Activity {
         mWebSettings.setUseWideViewPort(true);
         mWebSettings.setLoadWithOverviewMode(true);
 
+        mWebSettings.setJavaScriptEnabled(true);
+        mWebSettings.setDomStorageEnabled(true);// 打开本地缓存提供JS调用,至关重要
+        mWebSettings.setAppCacheMaxSize(1024 * 1024 * 8);// 实现8倍缓存
+        mWebSettings.setAllowFileAccess(true);
+        mWebSettings.setAppCacheEnabled(true);
+        String appCachePath = getApplication().getCacheDir().getAbsolutePath();
+        mWebSettings.setAppCachePath(appCachePath);
+        mWebSettings.setDatabaseEnabled(true);
 
         mWebview.loadUrl(_curUrl);
 
