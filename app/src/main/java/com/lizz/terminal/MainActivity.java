@@ -9,9 +9,12 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.dothantech.lpapi.LPAPI;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -20,7 +23,9 @@ public class MainActivity extends Activity {
     WebView mWebview;
     WebSettings mWebSettings;
 
-    String _curUrl = "http://admin.sandenjjg.mooho.com.cn/pda";
+    LPAPI mPrinter;
+
+    String _curUrl = "file:///android_asset/index.html";
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -37,17 +42,16 @@ public class MainActivity extends Activity {
         mWebSettings.setLoadWithOverviewMode(true);
         mWebSettings.setDomStorageEnabled(true);
 
+        // 在WebView加载html文件之前初始化标签打印接口
+        mPrinter = LPAPI.Factory.createInstance(mWebview);
+
         mWebview.loadUrl(_curUrl);
 
         //设置不用系统浏览器打开,直接显示在当前Webview
         mWebview.setWebViewClient(new WebViewClient() {
+
             @Override
-            public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                //Android 8.0以下版本的需要返回true 并且需要loadUrl()
-                if (Build.VERSION.SDK_INT < 26) {
-                    view.loadUrl(url);
-                    return true;
-                }
+            public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 return false;
             }
         });
