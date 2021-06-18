@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
         mWebSettings.setJavaScriptEnabled(true);
         mWebSettings.setUseWideViewPort(true);
         mWebSettings.setLoadWithOverviewMode(true);
-
+        mWebSettings.setDomStorageEnabled(true);
 
         mWebview.loadUrl(_curUrl);
 
